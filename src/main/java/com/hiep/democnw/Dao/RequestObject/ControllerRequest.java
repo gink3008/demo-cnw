@@ -24,6 +24,8 @@ public class ControllerRequest {
     @NotEmpty
     private int permissionId;
 
+    private String Method;
+
     public ControllerRequest(@NotEmpty @Size(max = 30) String name) {
         this.name = name;
     }

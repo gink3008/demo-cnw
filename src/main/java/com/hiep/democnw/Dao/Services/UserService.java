@@ -49,12 +49,12 @@ public class UserService {
         return byId.get();
     }
 
-    public Boolean updateByID(int id, String username, String password) {
-        Optional<UsersEntity> byId = userRespository.findById(id);
-        if (userRespository.existsById(id)) {
-            UsersEntity users = byId.get();
-            users.setUsername(username);
-            users.setPassword(password);
+    public Boolean updateByID(String name,UserRequest userRequest) {
+        UsersEntity byName = findByUsername(name);
+        if (byName != null) {
+            UsersEntity users = byName;
+            users.setUsername(userRequest.getUsername());
+            users.setPassword(userRequest.getPassword());
             userRespository.save(users);
             return true;
         }

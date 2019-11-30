@@ -2,7 +2,9 @@ package com.hiep.democnw.Dao.Services;
 
 import com.hiep.democnw.Dao.Repository.RolePermissionRepository;
 import com.hiep.democnw.Dao.RequestObject.RolePermissionRequest;
+import com.hiep.democnw.Dao.RequestObject.UserRoleRequest;
 import com.hiep.democnw.Entities.real.RolePermissionEntity;
+import com.hiep.democnw.Entities.real.UserRoleEntity;
 import com.hiep.democnw.Exception.UserUnknowException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,6 +44,30 @@ public class RolePermissionService {
 
         return byId.get();
     }
+    public RolePermissionEntity findByCode(Integer code)
+    {
+        List<RolePermissionEntity> rolePermissionEntities = getAllRolePermission();
+        for(RolePermissionEntity rolePermissionEntity : rolePermissionEntities)
+        {
+            if(rolePermissionEntity.getCode() == code)
+            {
+                return rolePermissionEntity;
+            }
+        }
+        return null;
+    }
+
+    public Boolean updateByCode(Integer code, RolePermissionRequest rolePermissionRequest) {
+        RolePermissionEntity byCode = findByCode(code);
+        if (byCode != null) {
+            RolePermissionEntity rolePermissionEntity = byCode;
+            rolePermissionEntity.setIdPermission(rolePermissionRequest.getPermissionId());
+            rolePermissionRepository.save(rolePermissionEntity);
+            return true;
+        }
+        return false;
+
+    }
 
     public Boolean updateByID(Integer id, RolePermissionRequest rolePermissionRequest) {
         Optional<RolePermissionEntity> byId = rolePermissionRepository.findById(id);
@@ -55,5 +81,14 @@ public class RolePermissionService {
         }
         return false;
 
+    }
+
+    public boolean Delete(int code) {
+        RolePermissionEntity byId = findByCode(code);
+        if (byId != null) {
+            rolePermissionRepository.delete(byId);
+            return true;
+        }
+        return false;
     }
 }

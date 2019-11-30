@@ -33,7 +33,7 @@ public class ControllerService {
         return controllerRepository.findAll();
     }
 
-    public ControllerEntity getRoleById(Integer id) {
+    public ControllerEntity getControllerById(Integer id) {
         Optional<ControllerEntity> byId = controllerRepository.findById(id);
         if (byId.isPresent() == false) {
             throw new UserUnknowException(String.format("Role have id : '%s' not found" + id));
@@ -42,7 +42,7 @@ public class ControllerService {
         return byId.get();
     }
 
-    public Boolean updateRoleByID(Integer id, ControllerRequest controllerRequest) {
+    public Boolean updateControllerByID(Integer id, ControllerRequest controllerRequest) {
         Optional<ControllerEntity> byId = controllerRepository.findById(id);
         if (controllerRepository.existsById(id)) {
             ControllerEntity controller = byId.get();
@@ -56,7 +56,7 @@ public class ControllerService {
 
     }
 
-    public ControllerEntity findByRolename(String name) {
+    public ControllerEntity findByControllerName(String name) {
         for (ControllerEntity controllerEntity : getAllControllers()) {
             if (controllerEntity.getNameController().equals(name)) {
                 return controllerEntity;

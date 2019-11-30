@@ -67,6 +67,17 @@ public class RoleService {
 
     }
 
+    public Boolean deleteRole(RoleRequest roleRequest)
+    {
+        RolesEntity rolesEntity = findByRoleName(roleRequest.getName());
+        if(rolesEntity != null)
+        {
+            roleRepository.delete(rolesEntity);
+            return true;
+        }
+        return false;
+    }
+
     public RolesEntity findByRoleName(String name) {
         List<RolesEntity> lstRole = getAllRoles();
         if(lstRole != null)
@@ -137,6 +148,5 @@ public class RoleService {
             }
         }
         return controllerEntities;
-
     }
 }

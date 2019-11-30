@@ -3,6 +3,7 @@ package com.hiep.democnw.Dao.Services;
 import com.hiep.democnw.Dao.Repository.UserRoleRepository;
 import com.hiep.democnw.Dao.RequestObject.UserRoleRequest;
 import com.hiep.democnw.Entities.real.UserRoleEntity;
+import com.hiep.democnw.Entities.real.UsersEntity;
 import com.hiep.democnw.Exception.UserUnknowException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,17 +46,36 @@ public class UserRoleService {
         return byId.get();
     }
 
-    public Boolean updateByID(Integer id, UserRoleRequest userRoleRequest) {
-        Optional<UserRoleEntity> byId = userRoleRepository.findById(id);
-        if (userRoleRepository.existsById(id)) {
-            UserRoleEntity users = byId.get();
-            users.setCode(userRoleRequest.getCode());
+    public UserRoleEntity findByCode(Integer code)
+    {
+        List<UserRoleEntity> userRoleEntities = getAllUserRole();
+        for(UserRoleEntity userRoleEntity : userRoleEntities)
+        {
+            if(userRoleEntity.getCode() == code)
+            {
+                return userRoleEntity;
+            }
+        }
+        return null;
+    }
+
+    public Boolean updateByCode(Integer code, UserRoleRequest userRoleRequest) {
+        UserRoleEntity byCode = findByCode(code);
+        if (byCode != null) {
+            UserRoleEntity users = byCode;
             users.setIdRole(userRoleRequest.getRoleId());
-            users.setIdUser(userRoleRequest.getUserId());
             userRoleRepository.save(users);
             return true;
         }
         return false;
 
+    }
+    public Boolean Delete(int code) {
+        UserRoleEntity byId = findByCode(code);
+        if (byId != null) {
+            userRoleRepository.delete(byId);
+            return true;
+        }
+        return false;
     }
 }

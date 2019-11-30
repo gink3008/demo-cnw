@@ -1,6 +1,9 @@
 package com.hiep.democnw.Controller;
 
 import com.hiep.democnw.Dao.RequestObject.ControllerRequest;
+import com.hiep.democnw.Dao.RequestObject.UserRoleRequest;
+import com.hiep.democnw.Entities.real.PermissionEntity;
+import com.hiep.democnw.Entities.real.RolesEntity;
 import com.hiep.democnw.Entities.real.UsersEntity;
 import com.hiep.democnw.Dao.RequestObject.UserRequest;
 import com.hiep.democnw.Dao.Services.UserService;
@@ -61,9 +64,9 @@ public class UserController {
         return ResponseEntity.ok(listUserRequests);
     }
 
-    @GetMapping("/getlist_user/{id}")
-    public ResponseEntity<Object> getUserByID(Session session, @PathVariable("id") int id) {
-        UsersEntity users = userService.getUserById(id);
+    @GetMapping("/getlist_user/{username}")
+    public ResponseEntity<Object> getUserByID(Session session, @PathVariable("username") String username) {
+        UsersEntity users = userService.findByUsername(username);
         if (users != null) {
             UserRequest userRequest = new UserRequest();
             userRequest.setUsername(users.getUsername());
@@ -75,9 +78,20 @@ public class UserController {
         return new ResponseEntity<Object>("Not Found User", HttpStatus.BAD_REQUEST);
     }
 
-    @PutMapping("/update_user")
-    public ResponseEntity<Boolean> updateUserById(@PathVariable("id") int id, @PathVariable("username") String username, @PathVariable("password") String password) {
-        return ResponseEntity.ok(userService.updateByID(id, username, password));
+    @PutMapping("/update_user/{username}")
+    public ResponseEntity<Boolean> updateUserByName(@PathVariable("username") String username,@Valid @RequestBody UserRequest userRequest) {
+        UsersEntity usersEntity = userService.findByUsername(userRequest.getUsername());
+        int id = usersEntity.getIdUser();
+        if (usersEntity != null) {
+//            System.out.print(roleRequest.getName());
+            boolean check = userService.updateByID(username,userRequest);
+            if(check)
+            {
+                return new ResponseEntity<Boolean>(check, HttpStatus.OK); // doan nay chua hoan thanh
+
+            }
+        }
+        return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
     }
 
 }

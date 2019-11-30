@@ -46,7 +46,7 @@ public class RoleController {
     }
 
     @GetMapping("/getlist_role/{id}")
-    public ResponseEntity<Object> getUserByID(Session session, @PathVariable("id") int id) {
+    public ResponseEntity<Object> getlist(Session session, @PathVariable("id") int id) {
         RolesEntity role = roleService.getRoleById(id);
         if (role != null) {
             RoleRequest roleRequest = new RoleRequest();
@@ -58,7 +58,7 @@ public class RoleController {
     }
 
     @PutMapping("/update_role/{name}")
-    public ResponseEntity<Void> updateRole(@PathVariable("name") String name,@Valid @RequestBody RoleRequest roleRequest, UriComponentsBuilder uriComponentsBuilder) {
+    public ResponseEntity<Void> update(@PathVariable("name") String name,@Valid @RequestBody RoleRequest roleRequest, UriComponentsBuilder uriComponentsBuilder) {
         RolesEntity role = roleService.findByRoleName(name);
         int id = role.getIdRole();
         UriComponents uriComponents = uriComponentsBuilder.path("api/role/id : {id}").buildAndExpand(id);
@@ -74,7 +74,7 @@ public class RoleController {
     }
 
     @PostMapping("/create_role")
-    public ResponseEntity<Void> createNewRole(@Valid @RequestBody RoleRequest roleRequest, UriComponentsBuilder uriComponentsBuilder) {
+    public ResponseEntity<Void> create(@Valid @RequestBody RoleRequest roleRequest, UriComponentsBuilder uriComponentsBuilder) {
         boolean check = roleService.createNewRole(roleRequest);
         UriComponents uriComponents = uriComponentsBuilder.path("api/role/check : {check}").buildAndExpand(check);
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -86,4 +86,16 @@ public class RoleController {
         return new ResponseEntity<Void>(httpHeaders, HttpStatus.BAD_REQUEST);
     }
 
-}
+    @DeleteMapping("/delete_role")
+    public ResponseEntity<Boolean> delete(@Valid @RequestBody RoleRequest roleRequest, UriComponentsBuilder uriComponentsBuilder)
+        {
+            boolean check = roleService.deleteRole(roleRequest);
+            if(check)
+            {
+                return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+            }
+
+            return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
+
+        }
+    }

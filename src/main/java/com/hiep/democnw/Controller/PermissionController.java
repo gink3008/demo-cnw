@@ -59,11 +59,11 @@ public class PermissionController {
             return ResponseEntity.ok(permissionRequest);
         }
 
-        return new ResponseEntity<Object>("Not Found User", HttpStatus.NO_CONTENT);
+        return new ResponseEntity<Object>("Not Found User", HttpStatus.BAD_REQUEST);
     }
-    @PutMapping("/update_permission/{name}")
-    public ResponseEntity<Void> updatePermission(@PathVariable("name") String name, @Valid @RequestBody PermissionRequest permissionRequest, UriComponentsBuilder uriComponentsBuilder) {
-        PermissionEntity permissionEntity = permissionService.findByRolename(name);
+    @PutMapping("/update_permission")
+    public ResponseEntity<Void> updatePermission(@Valid @RequestBody PermissionRequest permissionRequest, UriComponentsBuilder uriComponentsBuilder) {
+        PermissionEntity permissionEntity = permissionService.findByRolename(permissionRequest.getName());
         int id = permissionEntity.getIdPermission();
         UriComponents uriComponents = uriComponentsBuilder.path("api/role/id : {id}").buildAndExpand(id);
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -71,7 +71,7 @@ public class PermissionController {
         if (permissionEntity != null) {
 //            System.out.print(roleRequest.getName());
             permissionService.updatePermissionByID(id,permissionRequest);
-            return new ResponseEntity<Void>(httpHeaders, HttpStatus.CREATED); // doan nay chua hoan thanh
+            return new ResponseEntity<Void>(httpHeaders, HttpStatus.OK); // doan nay chua hoan thanh
 
         }
         return new ResponseEntity<Void>(httpHeaders, HttpStatus.BAD_REQUEST);
