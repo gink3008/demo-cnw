@@ -16,15 +16,19 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.security.Key;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private RoleService roleService;
+    private MapApiRole mapApiRole;
     @Bean
     public JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter() throws Exception {
         JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter = new JwtAuthenticationTokenFilter();
@@ -53,111 +57,59 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     protected void configure(HttpSecurity http) throws Exception {
-        // Disable crsf cho đường dẫn /rest/**
-//        http.csrf().ignoringAntMatchers("/api/**");
-//        http.authorizeRequests().antMatchers("/user/login").permitAll();
-//        http.logout()
-//                .logoutUrl("/user/logout")
-//                .logoutSuccessUrl("http://localhost:3000")
-////                .logoutSuccessHandler(logoutSuccessHandler)
-////                .invalidateHttpSession(true)
-////                .addLogoutHandler(logoutHandler)
-////                .deleteCookies(cookieNamesToClear)
-//                .and();
 
-//        http.csrf().ignoringAntMatchers("/api/**");
-//        http.authorizeRequests().antMatchers("/user/login**").permitAll();
-//        http.antMatcher("/api/users/**").httpBasic().authenticationEntryPoint(restServicesEntryPoint()).and()
-//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and();
-//        http.authorizeRequests(authorizeRequests  -> authorizeRequests .antMatchers(HttpMethod.GET, "/api/users/getlist_user/**")
-//                .hasRole("ADMIN4")
-//                                                                        .antMatchers(HttpMethod.GET, "/api/users/getlist_user/**")
-//                .hasRole("ADMIN2")
-//        );
-//
-//        http
-//                .addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class)
-//                .exceptionHandling().accessDeniedHandler(customAccessDeniedHandler());
-//
-//
-//
-//        http.authorizeRequests().antMatchers("/api/**").denyAll();
-//        List<RolesEntity> rolesEntities = roleService.getAllRoles();
-//        for(RolesEntity rolesEntity: rolesEntities){
-//            System.out.print(rolesEntity.getName());
-//        }
-//
-//        if(rolesEntities != null)
-//        {
-//            for(RolesEntity rolesEntity: rolesEntities)
-//            {
-//                List<PermissionEntity> permissionEntities =roleService.getPermissionByRole(rolesEntity);
-//                if(permissionEntities != null)
-//                {
-//                    for(PermissionEntity permissionEntity : permissionEntities)
-//                    {
-//                        Set<RoleControllerEntity> roleControllers = rolesEntity.getRoleControllersByIdRole();
-//                        if(roleControllers != null)
-//                        {
-//                            for(RoleControllerEntity roleControllerEntity : roleControllers)
-//                            {
-//                                List<ControllerEntity> controllerEntities = permissionEntity.getControllersByIdPermission();
-//                                if(controllerEntities != null)
-//                                {
-//                                    for(ControllerEntity controllerEntity : controllerEntities)
-//                                    {
-//                                        String controllername1 = controllerEntity.getNameController();
-//                                        String controllernameEquared = roleControllerEntity.getControllerByIdController().getNameController();
-//
-//                                        String [] rolename = rolesEntity.getName().split("_", 2); // Lay ROLENAME
-//                                        System.out.print("\n"+rolename[1] + "\n");
-//                                        if(controllername1.equals(controllernameEquared)){
-//                                            System.out.print("--------------------------------------------------------------------------");
-//
-//                                            System.out.print("\n" +rolesEntity.getName() + ";  " +permissionEntity.getNamePermission() + ":   " + roleControllerEntity.getControllerByIdController().getNameController()+ "\n");
-//                                            System.out.print(permissionEntity.getUrl()+"/"+controllerEntity.getNameController()+"/**");
-//                                            switch (controllerEntity.getMethod()) {
-//                                                case "post":
-//
-//                                                    System.out.print("\n post \n");
-//                                                    http
-//                                                            .authorizeRequests()
-//                                                            .antMatchers(HttpMethod.POST, permissionEntity.getUrl()+"/"+controllerEntity.getNameController()+"/**").hasRole(rolename[1]);
-//                                                    break;
-//                                                case "get":
-//                                                    System.out.print("\n get \n");
-//                                                    http
-//                                                            .authorizeRequests()
-//                                                            .antMatchers(HttpMethod.GET, permissionEntity.getUrl()+"/"+controllerEntity.getNameController()+"/**").hasRole(rolename[1]);
-//                                                    break;
-//                                                case "delete":
-//                                                    System.out.print("\n delete \n");
-//                                                    http
-//                                                            .authorizeRequests()
-//                                                            .antMatchers(HttpMethod.DELETE, permissionEntity.getUrl()+"/"+controllerEntity.getNameController()+"/**").hasRole(rolename[1]);
-//                                                    break;
-//                                                case "put":
-//                                                    System.out.print("\n put \n");
-//                                                    http
-//                                                            .authorizeRequests()
-//                                                            .antMatchers(HttpMethod.PUT, permissionEntity.getUrl()+"/"+controllerEntity.getNameController()+"/**").hasRole(rolename[1]);
-//                                                    break;
-//                                                default:
-//                                                    break;
-//                                            }
-//                                        }
-//
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        http
-//                .addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class)
-//                .exceptionHandling().accessDeniedHandler(customAccessDeniedHandler());
+        http.csrf().ignoringAntMatchers("/api/**");
+        http.authorizeRequests().antMatchers("/user/login**").permitAll();
+        http.antMatcher("/api/users/**").httpBasic().authenticationEntryPoint(restServicesEntryPoint()).and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and();
+
+        HashMap<String, Set<String>> a = mapApiRole.getAllApi();
+        a.forEach((key,value) -> {
+            System.out.print("\n " + key + " \n");
+
+            try {
+                     String[] b = key.split(":",2);
+                     b[0] = b[0].toLowerCase();
+                     System.out.print("\n " + b[0] + " \n");
+                     System.out.print("\n " + value + " \n");
+                     System.out.print("\n " + b[1] + " \n");
+
+
+                    switch (b[0])
+                     {
+                         case "post":
+                             http
+                                     .authorizeRequests()
+                                     .antMatchers(HttpMethod.POST,b[1]).hasAnyRole(String.join(",",value));
+                             break;
+                         case "get":
+                             http
+                                     .authorizeRequests()
+                                     .antMatchers(HttpMethod.GET, b[1]).hasAnyRole(String.join(",",value));
+                             break;
+                         case "delete":
+                             http
+                                     .authorizeRequests()
+                                     .antMatchers(HttpMethod.DELETE, b[1]).hasAnyRole(String.join(",",value));
+                             break;
+                         case "put":
+                             http
+                                     .authorizeRequests()
+                                     .antMatchers(HttpMethod.PUT, b[1]).hasAnyRole(String.join(",",value));
+                             break;
+                         default:
+                             break;
+                     }
+                     } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                }
+        );
+
+        http
+                .addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling().accessDeniedHandler(customAccessDeniedHandler());
+
 
     }
 }

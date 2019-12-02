@@ -71,18 +71,5 @@ public class PermissionService {
         return null;
     }
 
-    public List<ControllerRequest> getControllerRequestByPermission(RolesEntity roles) {
-        List<ControllerRequest> controllerRequests = new ArrayList<>();
-        Set<RolePermissionEntity> rolePermissions = roles.getRolePermissionsByIdRole();
-        if(rolePermissions != null){
-            for(RolePermissionEntity rolePermission : rolePermissions)
-            {
-                ControllerRequest controllerRequest = new ControllerRequest();
-                controllerRequest.setName(rolePermission.getPermissionByIdPermission().getNamePermission());
-                controllerRequests.add(controllerRequest);
-            }
-        }
-        return controllerRequests;
 
-    }
 }
